@@ -1,29 +1,34 @@
 name: Server Status Monitor
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Проверка каждые 5 минут
-  workflow_dispatch:       # Разрешить ручной запуск
-  push:                    # Запускать при изменении кода
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+  push:
     branches: [main]
 
 jobs:
   check-status:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
     - name: Check server status
       run: |
-        # Простейшая проверка через netcat
+        sudo apt-get update
+        sudo apt-get install -y netcat
+        
         if nc -zv 15.61.58.144 7777 2>&1 | grep -q "succeeded"; then
           echo "ONLINE" > status.txt
         else
           echo "OFFLINE" > status.txt
         fi
         
-        # Добавляем время проверки
         echo "Last checked: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> status.txt
         
-    - name: Upload status
-      uses: actions/upload-artifact@v3
-      with:
-        name: status
-        path: status.txt
+        # Коммитим изменения напрямую
+        git config user.name "GitHub Actions"
+        git config user.email "actions@users.noreply.github.com"
+        git add status.txt
+        git commit -m "Update server status"
+        git push
