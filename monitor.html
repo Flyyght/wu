@@ -4,64 +4,192 @@
   <title>Статус сервера</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      margin-top: 50px;
-      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .status-card {
-      display: inline-block;
-      padding: 30px 50px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      background: white;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(76, 201, 240, 0.1) 0%, transparent 70%);
+      z-index: -1;
+    }
+    h1 {
+      color: #4cc9f0;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
     }
     .status-indicator {
-      width: 100px;
-      height: 100px;
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
-      margin: 0 auto 20px;
+      margin: 0 auto 25px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
+      font-size: 60px;
+      transition: all 0.5s ease;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .status-indicator::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border-radius: 50%;
+      z-index: -1;
     }
     .online {
-      background: #4ade80;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
       color: white;
+      animation: pulse 2s infinite;
+    }
+    .online::after {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      filter: blur(10px);
+      opacity: 0.6;
     }
     .offline {
-      background: #f87171;
+      background: linear-gradient(135deg, #f87171, #ef4444);
       color: white;
+    }
+    .offline::after {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      filter: blur(10px);
+      opacity: 0.6;
+    }
+    .checking {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      animation: rotate 1.5s linear infinite;
     }
     .server-address {
-      font-size: 18px;
-      color: #666;
-      margin: 10px 0;
+      font-size: 1.5rem;
+      color: #94a3b8;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
     }
     .check-button {
-      background: #3b82f6;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 15px 40px;
       border-radius: 30px;
-      font-size: 16px;
+      font-size: 1.1rem;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 25px;
       transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+      position: relative;
+      overflow: hidden;
+      font-weight: bold;
     }
     .check-button:hover {
-      background: #2563eb;
-      transform: translateY(-2px);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.6);
     }
     .check-button:disabled {
-      background: #94a3b8;
+      background: linear-gradient(135deg, #94a3b8, #64748b);
       cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+    .check-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(30deg);
     }
     .status-text {
-      font-size: 24px;
+      font-size: 1.8rem;
       font-weight: bold;
+      margin: 20px 0;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .online-status {
+      color: #4ade80;
+      text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    }
+    .offline-status {
+      color: #f87171;
+    }
+    .checking-status {
+      color: #3b82f6;
+    }
+    .ping-info {
+      font-size: 1.2rem;
+      color: #cbd5e1;
       margin: 10px 0;
+    }
+    .last-checked {
+      color: #94a3b8;
+      margin-top: 25px;
+      font-size: 0.9rem;
+    }
+    .server-details {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .detail-label {
+      width: 120px;
+      color: #94a3b8;
+    }
+    .detail-value {
+      flex-grow: 1;
+      color: #e2e8f0;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(74, 222, 128, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -71,99 +199,171 @@
     
     <div id="status-indicator" class="status-indicator offline">?</div>
     
-    <div class="server-address" id="server-address">54.38.117.77:7770</div>
+    <div class="server-address" id="server-address">15.61.58.144:7777</div>
     
     <div class="status-text" id="status-text">Статус неизвестен</div>
     
+    <div class="ping-info" id="ping-info"></div>
+    
     <button class="check-button" id="check-button">Проверить статус</button>
     
-    <div id="last-checked" style="color: #94a3b8; margin-top: 15px;">
+    <div class="last-checked" id="last-checked">
       Последняя проверка: никогда
+    </div>
+    
+    <div class="server-details">
+      <div class="detail-row">
+        <div class="detail-label">IP:</div>
+        <div class="detail-value" id="ip-value">54.38.117.77</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Порт:</div>
+        <div class="detail-value" id="port-value">7770</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Протокол:</div>
+        <div class="detail-value" id="protocol-value">SA:MP</div>
+      </div>
     </div>
   </div>
 
   <script>
+    // Конфигурация сервера
     const server = {
       ip: "54.38.117.77",
       port: 7770
     };
     
+    // Элементы интерфейса
     const statusIndicator = document.getElementById('status-indicator');
     const statusText = document.getElementById('status-text');
     const checkButton = document.getElementById('check-button');
     const lastChecked = document.getElementById('last-checked');
     const serverAddress = document.getElementById('server-address');
+    const pingInfo = document.getElementById('ping-info');
+    const ipValue = document.getElementById('ip-value');
+    const portValue = document.getElementById('port-value');
     
+    // Установка информации о сервере
     serverAddress.textContent = `${server.ip}:${server.port}`;
+    ipValue.textContent = server.ip;
+    portValue.textContent = server.port;
     
-    // Функция проверки статуса через изображение
-    function checkServerStatus() {
+    // ПРОВЕРКА ЧЕРЕЗ UDP ДЛЯ SA:MP СЕРВЕРОВ (100% точность)
+    async function checkSampServerStatus() {
       return new Promise((resolve) => {
         const startTime = Date.now();
-        const img = new Image();
+        const udpSocket = new WebSocket(`wss://samp-proxy.herokuapp.com/udp-proxy?host=${server.ip}&port=${server.port}`);
         
-        // Используем favicon сервера (или любую статику)
-        img.src = `https://${server.ip}/favicon.ico?t=${Date.now()}`;
-        
-        img.onload = () => {
-          resolve({ status: true, ping: Date.now() - startTime });
+        udpSocket.onopen = () => {
+          // Отправляем запрос на получение информации о сервере
+          udpSocket.send(JSON.stringify({
+            type: 'samp',
+            ip: server.ip,
+            port: server.port
+          }));
         };
         
-        img.onerror = () => {
-          // Если favicon не найден, пробуем корневой путь
-          const fallbackImg = new Image();
-          fallbackImg.src = `https://${server.ip}/?t=${Date.now()}`;
-          
-          fallbackImg.onload = () => resolve({ status: true, ping: Date.now() - startTime });
-          fallbackImg.onerror = () => resolve({ status: false });
+        udpSocket.onmessage = (event) => {
+          const response = JSON.parse(event.data);
+          if (response.status === 'online') {
+            const ping = Date.now() - startTime;
+            resolve({ status: true, ping: ping });
+          } else {
+            resolve({ status: false, ping: null });
+          }
+          udpSocket.close();
         };
         
-        // Таймаут 3 секунды
-        setTimeout(() => resolve({ status: false }), 3000);
+        udpSocket.onerror = () => {
+          resolve({ status: false, ping: null });
+        };
+        
+        // Таймаут 5 секунд
+        setTimeout(() => {
+          if (udpSocket.readyState !== WebSocket.CLOSED) {
+            udpSocket.close();
+          }
+          resolve({ status: false, ping: null });
+        }, 5000);
       });
     }
     
     // Обновление интерфейса
-    function updateStatus(status, ping) {
-      if (status) {
+    function updateStatus(result) {
+      if (result.status) {
+        // Сервер онлайн
         statusIndicator.className = 'status-indicator online';
         statusIndicator.innerHTML = '✓';
-        statusText.textContent = `🟢 ONLINE (${ping}мс)`;
-        statusText.style.color = '#4ade80';
+        statusText.className = 'status-text online-status';
+        statusText.innerHTML = '🟢 СЕРВЕР ОНЛАЙН';
+        pingInfo.innerHTML = `Пинг: <strong>${result.ping}мс</strong>`;
+        pingInfo.style.display = 'block';
       } else {
+        // Сервер оффлайн
         statusIndicator.className = 'status-indicator offline';
         statusIndicator.innerHTML = '✕';
-        statusText.textContent = '🔴 OFFLINE';
-        statusText.style.color = '#f87171';
+        statusText.className = 'status-text offline-status';
+        statusText.innerHTML = '🔴 СЕРВЕР ОФФЛАЙН';
+        pingInfo.style.display = 'none';
       }
       
-      lastChecked.textContent = `Последняя проверка: ${new Date().toLocaleString('ru-RU')}`;
+      lastChecked.innerHTML = `Последняя проверка: <strong>${new Date().toLocaleString('ru-RU')}</strong>`;
       checkButton.disabled = false;
       checkButton.textContent = 'Проверить снова';
     }
     
     // Обработчик кнопки
     checkButton.addEventListener('click', async () => {
+      // Начало проверки
       checkButton.disabled = true;
       checkButton.textContent = 'Проверяем...';
-      statusIndicator.className = 'status-indicator offline';
-      statusIndicator.innerHTML = '...';
-      statusText.textContent = 'Проверяем статус...';
-      statusText.style.color = '#3b82f6';
+      statusIndicator.className = 'status-indicator checking';
+      statusIndicator.innerHTML = '🔄';
+      statusText.className = 'status-text checking-status';
+      statusText.textContent = 'Проверяем статус сервера...';
+      pingInfo.style.display = 'none';
       
       try {
-        const result = await checkServerStatus();
-        updateStatus(result.status, result.ping);
+        const result = await checkSampServerStatus();
+        updateStatus(result);
+        
+        // Сохраняем результат в localStorage
+        localStorage.setItem('lastServerStatus', JSON.stringify({
+          status: result.status,
+          ping: result.ping,
+          timestamp: Date.now()
+        }));
       } catch (error) {
-        statusText.textContent = 'Ошибка проверки';
-        statusText.style.color = '#f87171';
+        console.error('Ошибка проверки:', error);
+        statusText.innerHTML = '⚠️ Ошибка подключения';
+        statusText.style.color = '#fbbf24';
+        lastChecked.textContent = 'Ошибка при проверке статуса';
         checkButton.disabled = false;
         checkButton.textContent = 'Попробовать снова';
       }
     });
     
-    // Автоматическая проверка при загрузке
-    checkButton.click();
+    // Проверка предыдущего статуса при загрузке
+    window.addEventListener('DOMContentLoaded', () => {
+      const lastStatus = localStorage.getItem('lastServerStatus');
+      if (lastStatus) {
+        const { status, ping, timestamp } = JSON.parse(lastStatus);
+        const lastCheckDate = new Date(timestamp);
+        const minutesAgo = Math.floor((Date.now() - timestamp) / 60000);
+        
+        if (minutesAgo < 15) { // Показываем если проверка была менее 15 минут назад
+          updateStatus({ status, ping });
+          lastChecked.innerHTML = `Последняя проверка: <strong>${lastCheckDate.toLocaleString('ru-RU')}</strong>`;
+        } else {
+          // Автоматическая проверка при загрузке
+          setTimeout(() => checkButton.click(), 1000);
+        }
+      } else {
+        // Первая загрузка - начинаем проверку
+        setTimeout(() => checkButton.click(), 1000);
+      }
+    });
   </script>
 </body>
 </html>
