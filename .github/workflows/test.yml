@@ -1,9 +1,29 @@
-name: Test Workflow
-on: [workflow_dispatch]
+name: Server Status Monitor
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Проверка каждые 5 минут
+  workflow_dispatch:       # Разрешить ручной запуск
+  push:                    # Запускать при изменении кода
+    branches: [main]
 
 jobs:
-  test:
+  check-status:
     runs-on: ubuntu-latest
     steps:
-      - name: Hello World
-        run: echo "Hello GitHub Actions!"
+    - name: Check server status
+      run: |
+        # Простейшая проверка через netcat
+        if nc -zv 15.61.58.144 7777 2>&1 | grep -q "succeeded"; then
+          echo "ONLINE" > status.txt
+        else
+          echo "OFFLINE" > status.txt
+        fi
+        
+        # Добавляем время проверки
+        echo "Last checked: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> status.txt
+        
+    - name: Upload status
+      uses: actions/upload-artifact@v3
+      with:
+        name: status
+        path: status.txt
