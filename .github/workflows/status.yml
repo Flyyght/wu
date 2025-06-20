@@ -1,0 +1,30 @@
+name: Server Status Monitor
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  check-status:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Check server status
+      run: |
+        # Используем Python для проверки
+        python3 -c "import socket; exit(0) if 0 == socket.socket().connect_ex(('15.61.58.144', 7777)) else exit(1)" && \
+        echo "ONLINE" > status.txt || \
+        echo "OFFLINE" > status.txt
+        
+        echo "Last checked: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> status.txt
+        
+        # Коммитим изменения
+        git config user.name "GitHub Actions"
+        git config user.email "actions@users.noreply.github.com"
+        git add status.txt
+        git commit -m "Update server status"
+        git push
