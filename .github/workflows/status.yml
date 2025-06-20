@@ -1,8 +1,8 @@
 name: Server Status Monitor
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'  # Проверка каждые 5 минут
+  workflow_dispatch:        # Разрешить ручной запуск
   push:
     branches: [main]
 
@@ -12,19 +12,33 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+      with:
+        # Необходимо для последующего push
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Полная история коммитов
+        
+    - name: Setup Git identity
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@users.noreply.github.com"
+        
     - name: Check server status
       run: |
         # Используем Python для проверки
-        python3 -c "import socket; exit(0) if 0 == socket.socket().connect_ex(('15.61.58.144', 7777)) else exit(1)" && \
+        python3 -c "import socket; exit(0) if 0 == socket.socket().connect_ex(('54.38.117.77', 7770)) else exit(1)" && \
         echo "ONLINE" > status.txt || \
         echo "OFFLINE" > status.txt
         
         echo "Last checked: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> status.txt
         
-        # Коммитим изменения
-        git config user.name "GitHub Actions"
-        git config user.email "actions@users.noreply.github.com"
+    - name: Commit and push status
+      run: |
         git add status.txt
-        git commit -m "Update server status"
-        git push
+        
+        # Проверяем есть ли изменения
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update server status [skip ci]"
+          git push origin main
+        fi
