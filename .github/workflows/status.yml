@@ -16,7 +16,7 @@ jobs:
     - name: Check server status
       run: |
         sudo apt-get update
-        sudo apt-get install -y netcat-traditional
+        sudo apt-get install -y netcat-openbsd jq
         
         if nc -zv 15.61.58.144 7777 2>&1 | grep -q "succeeded"; then
           echo "ONLINE" > status.txt
